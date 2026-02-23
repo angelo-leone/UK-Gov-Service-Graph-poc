@@ -1,5 +1,7 @@
 # UK Government Service Graph — PoC
 
+NB: This is a hand-crafted proof of concept for illustration and education purposes only. Not a approved plan from GDS. 
+
 An interactive graph explorer and MCP server for UK government life events.
 
 **[View the live graph →](https://maxwellriess.github.io/UK-Gov-Service-Graph-poc/)**
@@ -88,4 +90,3 @@ The graph models the **semantic layer** needed for AI agents to navigate governm
 - Life events are named entry points that map citizen situations to service subgraphs
 - Eligibility signals (`proactive`, `gated`, `universal`, `means_tested`) tell agents how to present each service
 
-This is a hand-crafted proof of concept. The longer-term proposal is for GDS to publish and maintain this graph centrally, with departments taking ownership of their nodes over time — making it shared infrastructure for any AI assistant connecting to government services.
