@@ -6,7 +6,7 @@ An interactive graph explorer and MCP server for UK government life events.
 
 **[View the live graph →](https://maxwellriess.github.io/UK-Gov-Service-Graph-poc/)**
 
-This is a proof-of-concept for a machine-readable service graph that maps the cross-departmental dependencies between UK government services. The core idea: government services don't exist in isolation — registering a death is a prerequisite for bereavement benefits, registering a birth unlocks child benefit — and making those relationships explicit and machine-readable enables AI agents to guide citizens through the right services in the right order.
+This is a proof-of-concept for a machine-readable service graph that maps the cross-departmental dependencies between UK government services. The core idea: government services don't exist in isolation. Registering a death is a prerequisite for bereavement benefits, registering a birth unlocks child benefit. Making those relationships explicit and machine-readable enables AI agents to guide citizens through the right services in the right order.
 
 ---
 
