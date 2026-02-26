@@ -56,6 +56,8 @@ export interface EligibilityInfo {
   exclusions?:       string[];  // common reasons someone is NOT eligible
   means_tested:      boolean;
   evidenceRequired?: string[];  // documents / proof typically needed
+  ruleIn:            string[];  // concise positive signals ("Child under 16")
+  ruleOut:           string[];  // concise negative signals ("Income over £80k")
 }
 
 export interface ServiceNode {
@@ -112,6 +114,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Hospital notification of birth or midwife\'s notification', 'Parents\' ID documents'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'gro-register-death': {
@@ -136,6 +140,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Medical Certificate of Cause of Death (MCCD)', 'Deceased\'s NHS number and personal details if available'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'gro-death-certificate': {
@@ -158,6 +164,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Death registration completed'],
       means_tested: false,
       evidenceRequired: ['Death registration reference number', 'Fee per copy (currently £11)'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'gro-give-notice': {
@@ -184,6 +192,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Passport or birth certificate', 'Proof of current address', 'Decree absolute if previously married', 'Death certificate of former spouse if widowed', 'Immigration documents if not British/Irish citizen'],
+      ruleIn: ['Both parties aged 18 or over', 'Resident in district 7+ days'],
+      ruleOut: ['Either party currently married or in civil partnership'],
     },
   },
   'gro-marriage-cert': {
@@ -207,6 +217,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Marriage or civil partnership ceremony completed'],
       means_tested: false,
       evidenceRequired: ['Marriage took place — certificate issued at ceremony or ordered from register office'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
 
@@ -235,6 +247,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Not worth claiming if household income over £80,000 — full charge claws back entire benefit. However, still worth claiming to protect NI credits.'],
       means_tested: false,
       evidenceRequired: ['Child\'s birth certificate', 'Bank account details'],
+      ruleIn: ['Responsible for child under 16'],
+      ruleOut: ['Both parents earn over £80k'],
     },
   },
   'hmrc-guardians-allowance': {
@@ -259,6 +273,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Death certificates for deceased parent(s)', 'Child Benefit claim reference', 'Child\'s birth certificate'],
+      ruleIn: ['Both parents deceased or one missing', 'Claiming Child Benefit for the child'],
+      ruleOut: ['Surviving parent traceable and able to care for child'],
     },
   },
   'hmrc-statutory-parental-bereavement': {
@@ -284,6 +300,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Notice to employer (no formal form required)', 'Death or stillbirth certificate may be requested'],
+      ruleIn: ['Child under 18 died or stillbirth after 24 weeks', 'Employee at time of bereavement'],
+      ruleOut: [],
     },
   },
   'hmrc-smp': {
@@ -309,6 +327,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Self-employed — claim Maternity Allowance instead.', 'Employed for fewer than 26 weeks with current employer — claim Maternity Allowance.'],
       means_tested: false,
       evidenceRequired: ['MATB1 certificate from midwife or GP (issued from 20 weeks)', 'Written notice to employer of intended leave start date'],
+      ruleIn: ['Employed 26+ weeks with same employer', 'Earnings above lower earnings limit'],
+      ruleOut: ['Self-employed', 'Fewer than 26 weeks continuous employment'],
     },
   },
   'hmrc-spp': {
@@ -333,6 +353,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['SC3 form (self-certification) submitted to employer at least 15 weeks before due date'],
+      ruleIn: ['Father, partner, or co-adopter of newborn', 'Employed 26+ weeks continuously'],
+      ruleOut: [],
     },
   },
   'hmrc-spl': {
@@ -359,6 +381,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['SPLIT forms', 'Written curtailment notice from mother to her employer', 'Partner\'s employer contact details'],
+      ruleIn: ['Mother curtailing maternity leave', 'Both parents meet employment and earnings tests'],
+      ruleOut: ['Mother not eligible for SMP or Maternity Allowance'],
     },
   },
   'hmrc-free-childcare-15': {
@@ -379,6 +403,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Child aged 9 months to 4 years'],
       means_tested: false,
       evidenceRequired: ['Government Gateway account', 'Child\'s birth certificate'],
+      ruleIn: ['Child aged 9 months to 4 years'],
+      ruleOut: [],
     },
   },
   'hmrc-free-childcare-30': {
@@ -405,6 +431,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Households where either parent earns over £100k.', 'Non-working single parents (entitled to 15 hours only).'],
       means_tested: false,
       evidenceRequired: ['Tax-Free Childcare account eligibility check (reconfirm every 3 months)'],
+      ruleIn: ['Child aged 3 or 4 years', 'Both parents in paid work earning NMW for 16 hrs'],
+      ruleOut: ['Either parent earns over £100k', 'Non-working single parent'],
     },
   },
   'hmrc-tax-free-childcare': {
@@ -430,6 +458,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Cannot be used at the same time as Universal Credit childcare element — must choose one.'],
       means_tested: false,
       evidenceRequired: ['Government Gateway account', 'Childcare provider details'],
+      ruleIn: ['Both parents in work above minimum threshold', 'Child under 12'],
+      ruleOut: ['Currently receiving Universal Credit childcare element'],
     },
   },
   'hmrc-marriage-allowance': {
@@ -455,6 +485,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Cannot claim if either partner pays higher (40%) or additional (45%) rate tax.'],
       means_tested: false,
       evidenceRequired: ['Government Gateway account for the lower earner to apply'],
+      ruleIn: ['One partner earns below £12,570', 'Married or in civil partnership'],
+      ruleOut: ['Either partner pays higher or additional rate tax'],
     },
   },
   'hmrc-cancel-marriage-allowance': {
@@ -478,6 +510,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Marriage Allowance was in place and divorce/separation has occurred'],
       means_tested: false,
       evidenceRequired: ['Government Gateway account or contact HMRC by phone'],
+      ruleIn: ['Marriage Allowance previously claimed', 'Now separated, divorced, or widowed'],
+      ruleOut: [],
     },
   },
   'hmrc-update-records': {
@@ -501,6 +535,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Marriage certificate or deed poll if name change', 'Government Gateway account or Personal Tax Account'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'hmrc-sdlt': {
@@ -525,6 +561,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Property purchase completed in England'],
       means_tested: false,
       evidenceRequired: ['Completion statement', 'SDLT1 form (usually filed by solicitor)'],
+      ruleIn: ['Property purchase completed in England'],
+      ruleOut: [],
     },
   },
   'hmrc-lisa': {
@@ -550,6 +588,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Not available for second homes or existing property owners.', '25% withdrawal penalty if used for non-qualifying purposes.'],
       means_tested: false,
       evidenceRequired: ['LISA account details', 'Conveyancer handles request process from ISA provider'],
+      ruleIn: ['First-time buyer', 'LISA opened before age 40', 'Property costs £450k or less'],
+      ruleOut: ['Existing homeowner', 'Property over £450,000'],
     },
   },
   'hmrc-iht400': {
@@ -575,6 +615,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['IHT400 form and supplementary schedules', 'Valuations of all assets', 'Details of gifts made in the last 7 years', 'Copy of will'],
+      ruleIn: ['Estate value exceeds £325,000 nil-rate band'],
+      ruleOut: ['Estate below nil-rate band with no gifts'],
     },
   },
   'hmrc-p45': {
@@ -597,6 +639,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Employer provides P45 — no application needed'],
+      ruleIn: ['Leaving or having left PAYE employment'],
+      ruleOut: [],
     },
   },
   'hmrc-tax-refund': {
@@ -621,6 +665,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['P45 from former employer', 'P50 form for mid-year claim'],
+      ruleIn: ['Overpaid PAYE tax mid-year', 'Not returning to work before April 5th'],
+      ruleOut: ['Returning to work in same tax year'],
     },
   },
   'hmrc-self-assessment': {
@@ -646,6 +692,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Started trading as self-employed', 'Registered as a limited company director'],
       means_tested: false,
       evidenceRequired: ['National Insurance number', 'UTR (Unique Taxpayer Reference) issued by HMRC after registration'],
+      ruleIn: ['Self-employed, company director, or income over £100k', 'Rental or untaxed income at source'],
+      ruleOut: [],
     },
   },
   'hmrc-corporation-tax': {
@@ -670,6 +718,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Limited company registered at Companies House'],
       means_tested: false,
       evidenceRequired: ['Companies House registration number (CRN)', 'Registered office address', 'Business start date'],
+      ruleIn: ['Registered limited company'],
+      ruleOut: ['Sole trader or partnership'],
     },
   },
   'hmrc-vat': {
@@ -693,6 +743,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Business details', 'Turnover evidence', 'Bank account for repayments'],
+      ruleIn: ['Taxable turnover exceeded or expected to exceed £90,000'],
+      ruleOut: [],
     },
   },
   'hmrc-paye': {
@@ -717,6 +769,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['About to pay an employee for the first time'],
       means_tested: false,
       evidenceRequired: ['Business name and address', 'Nature of business', 'Date of first payday'],
+      ruleIn: ['Employing workers above lower earnings limit'],
+      ruleOut: [],
     },
   },
   'hmrc-mtd': {
@@ -742,6 +796,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['VAT registered'],
       means_tested: false,
       evidenceRequired: ['MTD-compatible software (e.g. Xero, QuickBooks, FreeAgent)', 'VAT registration number'],
+      ruleIn: ['VAT-registered business', 'Self-employed or landlord with income over £50k (from 2026)'],
+      ruleOut: [],
     },
   },
   'hmrc-register-sole-trader': {
@@ -765,6 +821,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['National Insurance number', 'UTR issued after registration'],
+      ruleIn: ['Started trading as sole trader'],
+      ruleOut: [],
     },
   },
   'hmrc-carers-credit': {
@@ -791,6 +849,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Not available if already receiving Carer\'s Allowance — that benefit already provides NI credits.'],
       means_tested: false,
       evidenceRequired: ['Evidence of caring role (CA9176 form)', 'Disability benefit details for the person cared for'],
+      ruleIn: ['Caring 20+ hours per week for qualifying benefit recipient', 'Not receiving NI credits via another route'],
+      ruleOut: ['Already receiving Carer\'s Allowance'],
     },
   },
   'hmrc-child-benefit-transfer': {
@@ -815,6 +875,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Government Gateway account of new claimant', 'Child\'s details and date of change'],
+      ruleIn: ['Child now living primarily with different parent', 'Parents separated'],
+      ruleOut: [],
     },
   },
   'hmrc-ni-check': {
@@ -839,6 +901,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Government Gateway login', 'National Insurance number'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'hmrc-tax-on-pension': {
@@ -863,6 +927,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['P60 from pension provider', 'State Pension confirmation letter'],
+      ruleIn: ['Receiving State Pension or private pension', 'Total income exceeds Personal Allowance'],
+      ruleOut: [],
     },
   },
 
@@ -888,6 +954,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Death registration completed — reference number provided at registration'],
       means_tested: false,
       evidenceRequired: ['Tell Us Once reference number (given by registrar)', 'Deceased\'s NI number and other details'],
+      ruleIn: ['Death registered in England, Scotland, or Wales'],
+      ruleOut: [],
     },
   },
   'dwp-bereavement-support': {
@@ -915,6 +983,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Not available if partner died before 6 April 2017 (different scheme applied).', 'Not available if you were cohabiting but not married or in a civil partnership.'],
       means_tested: false,
       evidenceRequired: ['Death certificate', 'Marriage or civil partnership certificate', 'NI numbers for both parties'],
+      ruleIn: ['Spouse or civil partner died', 'Under State Pension age at time of death', 'Deceased had 25+ weeks NI contributions'],
+      ruleOut: ['Cohabiting but not married or in civil partnership', 'Partner died before 6 April 2017'],
     },
   },
   'dwp-funeral-payment': {
@@ -940,6 +1010,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: true,
       evidenceRequired: ['Proof of qualifying benefit', 'Funeral bill or invoice from funeral director', 'Death certificate'],
+      ruleIn: ['Receiving qualifying means-tested benefit', 'Responsible for funeral costs'],
+      ruleOut: ['Close relative of deceased able to pay instead'],
     },
   },
   'dwp-state-pension': {
@@ -966,6 +1038,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Reached State Pension age with 35+ qualifying NI years'],
       means_tested: false,
       evidenceRequired: ['NI number', 'Bank account details for payment'],
+      ruleIn: ['Reached State Pension age (66+)', '10+ qualifying NI years'],
+      ruleOut: ['Under 66'],
     },
   },
   'dwp-pension-credit': {
@@ -992,6 +1066,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['State Pension age reached and income clearly below threshold'],
       means_tested: true,
       evidenceRequired: ['Bank statements', 'Pension and income details', 'Proof of savings and capital'],
+      ruleIn: ['Reached State Pension age (66+)', 'Weekly income below Pension Credit threshold'],
+      ruleOut: ['Savings above £10,000 reducing entitlement to zero'],
     },
   },
   'dwp-winter-fuel': {
@@ -1016,6 +1092,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['No longer available to those over State Pension age who are not on a qualifying benefit — major policy change from winter 2024.'],
       means_tested: false,
       evidenceRequired: ['Automatic if receiving Pension Credit — no separate application needed'],
+      ruleIn: ['Receiving Pension Credit or qualifying means-tested benefit'],
+      ruleOut: ['Over State Pension age but not on qualifying benefit'],
     },
   },
   'dwp-attendance-allowance': {
@@ -1043,6 +1121,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Under State Pension age — claim PIP instead.'],
       means_tested: false,
       evidenceRequired: ['AA1 claim form', 'Medical evidence from GP or specialist helpful', 'Carer details if applicable'],
+      ruleIn: ['Aged 66 or over', 'Personal care needs due to physical or mental condition'],
+      ruleOut: ['Under State Pension age'],
     },
   },
   'dwp-pip': {
@@ -1072,6 +1152,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Over State Pension age — claim Attendance Allowance instead.', 'Subject to immigration control in most cases.'],
       means_tested: false,
       evidenceRequired: ['PIP2 questionnaire (How your disability affects you)', 'Medical evidence from GP or specialist', 'Face-to-face or phone assessment with health professional'],
+      ruleIn: ['Disability or long-term health condition', 'Aged 16–64'],
+      ruleOut: ['Reached State Pension age (66+)'],
     },
   },
   'dwp-universal-credit': {
@@ -1100,6 +1182,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Savings over £16,000.', 'Some immigration statuses.', 'Receiving legacy benefits — transition managed by DWP.'],
       means_tested: true,
       evidenceRequired: ['Photo ID', 'NI number', 'Bank statements (last 3 months)', 'Proof of address', 'Rent details if applicable'],
+      ruleIn: ['Out of work or low income', 'UK resident aged 18 or over'],
+      ruleOut: ['Savings over £16,000', 'Over State Pension age'],
     },
   },
   'dwp-new-style-jsa': {
@@ -1126,6 +1210,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Time-limited to 6 months.', 'Not available if income or capital would disqualify in isolation (but can be paid alongside UC).'],
       means_tested: false,
       evidenceRequired: ['P45 from employer', 'NI number', 'Bank details', 'CV and job-seeking evidence'],
+      ruleIn: ['Class 1 NI contributions in last two tax years', 'Actively seeking work'],
+      ruleOut: ['Under State Pension age with no recent NI record'],
     },
   },
   'dwp-new-style-esa': {
@@ -1150,6 +1236,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Fit note from GP', 'NI number', 'Medical evidence', 'Work Capability Assessment (scheduled by DWP)'],
+      ruleIn: ['Health condition preventing or limiting work', 'NI contributions in last two tax years'],
+      ruleOut: [],
     },
   },
   'dwp-mandatory-reconsideration': {
@@ -1173,6 +1261,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Decision letter from DWP', 'Any supporting medical or financial evidence not previously considered'],
+      ruleIn: ['Received adverse DWP benefit decision', 'Within 1 month of decision letter'],
+      ruleOut: [],
     },
   },
   'dwp-maternity-allowance': {
@@ -1198,6 +1288,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Not available if eligible for Statutory Maternity Pay from an employer.'],
       means_tested: false,
       evidenceRequired: ['MATB1 certificate', 'Employment or self-employment evidence', 'Payslips or accounts', 'MA1 claim form'],
+      ruleIn: ['Not eligible for SMP', 'Self-employed or recently employed', 'Worked 26 weeks in last 66 weeks'],
+      ruleOut: ['Eligible for Statutory Maternity Pay from employer'],
     },
   },
   'dwp-sure-start-grant': {
@@ -1223,6 +1315,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Usually not available for second and subsequent children if there are other children under 16 in the family.'],
       means_tested: true,
       evidenceRequired: ['Evidence of qualifying benefit', 'MATB1 form or birth certificate', 'SF100 form'],
+      ruleIn: ['Receiving qualifying means-tested benefit', 'Expecting first baby or under 3 months old'],
+      ruleOut: ['Second or subsequent child with older children under 16'],
     },
   },
   'dwp-ni-credits': {
@@ -1247,6 +1341,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Receiving Universal Credit', 'Receiving New Style JSA', 'Claiming Child Benefit for child under 12'],
       means_tested: false,
       evidenceRequired: ['No separate application if receiving qualifying benefits — awarded automatically'],
+      ruleIn: ['Receiving UC, JSA, ESA, or Child Benefit for child under 12'],
+      ruleOut: [],
     },
   },
   'dwp-carers-allowance': {
@@ -1275,6 +1371,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Cannot claim if in full-time education (21+ hours/week).', 'Overlapping benefits rule — may not be payable in full alongside State Pension or other benefits.'],
       means_tested: false,
       evidenceRequired: ['Evidence of caring role', 'Benefit award letter for person cared for', 'Income evidence if working'],
+      ruleIn: ['Caring 35+ hours per week', 'Person cared for receives qualifying disability benefit', 'Net earnings below £151/week'],
+      ruleOut: ['In full-time education (21+ hours per week)'],
     },
   },
   'dwp-uc-carer': {
@@ -1300,6 +1398,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['On Universal Credit and eligible for Carer\'s Allowance'],
       means_tested: true,
       evidenceRequired: ['Notify DWP of caring role through UC journal'],
+      ruleIn: ['On Universal Credit', 'Eligible for Carer\'s Allowance (caring 35+ hrs/week)'],
+      ruleOut: [],
     },
   },
   'dwp-access-to-work': {
@@ -1324,6 +1424,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Evidence of employment or job offer', 'Evidence of disability or health condition (may be required)', 'Quotes for support/equipment needed'],
+      ruleIn: ['Disability or health condition affecting work or commute', 'In paid work or about to start'],
+      ruleOut: [],
     },
   },
   'dwp-uc-health': {
@@ -1349,6 +1451,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: true,
       evidenceRequired: ['Fit note from GP (SC1 or equivalent)', 'Medical evidence for WCA (UC50 questionnaire)', 'Assessment appointment with health professional'],
+      ruleIn: ['On Universal Credit', 'Health condition limits capacity for work'],
+      ruleOut: [],
     },
   },
   'dwp-child-maintenance': {
@@ -1374,6 +1478,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Paying parent\'s income details (CMS contacts HMRC directly)', 'Children\'s details', 'Your contact details'],
+      ruleIn: ['Separated parents with children under 16', 'No private maintenance arrangement'],
+      ruleOut: [],
     },
   },
   'dwp-ni-number': {
@@ -1399,6 +1505,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Biometric Residence Permit received and right to work confirmed'],
       means_tested: false,
       evidenceRequired: ['Proof of identity (passport or BRP)', 'Proof of address', 'Right to work documents'],
+      ruleIn: ['Right to work in the UK confirmed', 'No existing NI number'],
+      ruleOut: ['UK citizen (already assigned NI number at 16)'],
     },
   },
 
@@ -1424,6 +1532,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Proof of address (helpful but not required)', 'Previous GP name for record transfer'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'nhs-healthy-start': {
@@ -1448,6 +1558,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: true,
       evidenceRequired: ['MATB1 form or proof of pregnancy/child\'s age', 'Proof of qualifying benefit'],
+      ruleIn: ['Pregnant (10+ weeks) or child under 4', 'Receiving UC, Child Tax Credit, or Income Support'],
+      ruleOut: [],
     },
   },
   'nhs-free-prescriptions-pregnancy': {
@@ -1472,6 +1584,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Pregnant — apply for Maternity Exemption Certificate via midwife or GP'],
       means_tested: false,
       evidenceRequired: ['FW8 form signed by midwife or GP — gives Maternity Exemption Certificate (valid until 12 months after due date)'],
+      ruleIn: ['Currently pregnant or given birth within 12 months'],
+      ruleOut: [],
     },
   },
   'nhs-free-prescriptions': {
@@ -1498,6 +1612,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['PIP award confirmed', 'Qualifying medical condition (apply for Medical Exemption Certificate via GP)'],
       means_tested: false,
       evidenceRequired: ['Benefit award letter or FP92A medical exemption form signed by GP'],
+      ruleIn: ['Receiving PIP, DLA, or qualifying medical condition', 'Under 16, or 60 and over'],
+      ruleOut: [],
     },
   },
   'nhs-care-assessment': {
@@ -1521,6 +1637,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['No formal evidence required — contact local authority adult social care directly'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
 
@@ -1547,6 +1665,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['UK passport or birth certificate for identity', 'Address details', '£34 fee (online application)'],
+      ruleIn: ['Aged 15 years and 9 months or over', 'Normally resident in Great Britain'],
+      ruleOut: [],
     },
   },
 
@@ -1571,6 +1691,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Provisional driving licence (photocard)', '£23 test fee (booked online via DVSA)'],
+      ruleIn: ['Valid provisional driving licence held'],
+      ruleOut: [],
     },
   },
   'dvsa-driving-test': {
@@ -1594,6 +1716,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Theory test pass certificate (valid within 2 years)', 'Provisional driving licence photocard', '£62–£75 test fee (booked online via DVSA)'],
+      ruleIn: ['Theory test passed (valid within 2 years)'],
+      ruleOut: [],
     },
   },
 
@@ -1617,6 +1741,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Current driving licence', 'New address details', 'Government Gateway or DVLA online service'],
+      ruleIn: ['Holds GB driving licence', 'Has moved to new address'],
+      ruleOut: [],
     },
   },
   'dvla-name-change': {
@@ -1641,6 +1767,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Marriage or civil partnership certificate received and current licence name is now incorrect'],
       means_tested: false,
       evidenceRequired: ['D1 form (or online application)', 'Current driving licence', 'Marriage certificate or deed poll', 'Passport photo'],
+      ruleIn: ['Legal name change after marriage, civil partnership, or deed poll', 'Holds GB driving licence'],
+      ruleOut: [],
     },
   },
   'dvla-cancel-licence': {
@@ -1665,6 +1793,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Tell Us Once completed — DVLA notified automatically'],
       means_tested: false,
       evidenceRequired: ['Physical driving licence if available', 'D27 form', 'Death certificate'],
+      ruleIn: ['Deceased held GB driving licence'],
+      ruleOut: [],
     },
   },
   'dvla-notify-condition': {
@@ -1688,6 +1818,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Relevant medical reports or confirmation from GP', 'DVLA questionnaire (specific to condition)'],
+      ruleIn: ['Holds driving licence', 'Diagnosed with DVLA notifiable condition'],
+      ruleOut: [],
     },
   },
 
@@ -1715,6 +1847,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['IN01 form (or online via Companies House WebFiling/authorised agent)', 'Director details and consent', 'Registered office address', 'Share structure details'],
+      ruleIn: ['Director aged 16 or over', 'UK registered office address'],
+      ruleOut: [],
     },
   },
 
@@ -1743,6 +1877,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Jointly held assets (bank accounts, property) pass outside probate.', 'Some pension death benefits and life insurance written in trust pass outside probate.'],
       means_tested: false,
       evidenceRequired: ['Original will (if there is one)', 'Death certificate', 'Estimated estate value', 'PA1P (with will) or PA1A (no will) application form'],
+      ruleIn: ['Estate includes solely-held assets over £10,000', 'Death registered'],
+      ruleOut: ['All assets held jointly (pass automatically)'],
     },
   },
   'hmcts-divorce': {
@@ -1768,6 +1904,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Marriage or civil partnership certificate', 'D8 application form', 'Court fee (£593, or reduced if low income)'],
+      ruleIn: ['Married or in civil partnership at least 1 year', 'Domiciled or habitually resident in England/Wales'],
+      ruleOut: [],
     },
   },
   'hmcts-financial-order': {
@@ -1792,6 +1930,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Draft consent order (D81 form)', 'Financial disclosure from both parties', 'Court fee (£53)'],
+      ruleIn: ['In divorce or dissolution proceedings', 'Shared assets, property, or pensions'],
+      ruleOut: [],
     },
   },
   'hmcts-child-arrangements': {
@@ -1817,6 +1957,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['MIAM certificate (from mediator) or exemption evidence', 'C100 application form', 'Court fee (£232, or reduced if low income)'],
+      ruleIn: ['Separated parents unable to agree on child arrangements'],
+      ruleOut: [],
     },
   },
   'hmcts-legal-aid': {
@@ -1843,6 +1985,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Domestic abuse victim in family proceedings with supporting evidence'],
       means_tested: true,
       evidenceRequired: ['CW2 means test form', 'Income and savings evidence', 'Details of the case for merits assessment'],
+      ruleIn: ['Disposable income below £2,657/month', 'Domestic abuse victim or case with strong merits'],
+      ruleOut: ['Capital above £8,000'],
     },
   },
   'hmcts-benefit-tribunal': {
@@ -1866,6 +2010,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Mandatory Reconsideration Notice (SSCS1 form to appeal)', 'Any supporting evidence — medical reports, letters, assessments'],
+      ruleIn: ['Mandatory Reconsideration Notice received', 'Still disagrees with DWP decision'],
+      ruleOut: [],
     },
   },
 
@@ -1891,6 +2037,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['National Insurance number (for online registration)'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'la-voter-authority-cert': {
@@ -1915,6 +2063,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Electoral registration number or NI number to verify registration', 'Recent photograph', 'Online application via local council'],
+      ruleIn: ['Registered to vote', 'No accepted photo ID (passport, driving licence)'],
+      ruleOut: ['Already holds accepted photo ID for polling'],
     },
   },
   'la-council-tax': {
@@ -1938,6 +2088,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Tenancy agreement or proof of ownership', 'Move-in date'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'la-council-tax-single-discount': {
@@ -1961,6 +2113,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Application to local council (varies by authority)'],
+      ruleIn: ['Only adult (18+) now living in the property'],
+      ruleOut: [],
     },
   },
   'la-council-tax-reduction': {
@@ -1985,6 +2139,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: true,
       evidenceRequired: ['Proof of income and savings', 'Council Tax bill', 'Application to local authority'],
+      ruleIn: ['Low income or receiving means-tested benefit', 'Liable for Council Tax at address'],
+      ruleOut: [],
     },
   },
   'la-bus-pass': {
@@ -2008,6 +2164,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Reached State Pension age'],
       means_tested: false,
       evidenceRequired: ['Proof of age (passport or birth certificate)', 'Proof of address', 'Passport photo'],
+      ruleIn: ['Reached State Pension age (66)'],
+      ruleOut: [],
     },
   },
   'la-school-place': {
@@ -2032,6 +2190,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Child\'s birth certificate', 'Proof of address', 'Baptism certificate (for faith schools)'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'la-free-school-meals': {
@@ -2057,6 +2217,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Receiving Universal Credit with no or low earned income'],
       means_tested: true,
       evidenceRequired: ['Proof of qualifying benefit', 'Application via school office or local authority portal'],
+      ruleIn: ['Receiving qualifying benefit', 'Child at state school of compulsory school age'],
+      ruleOut: [],
     },
   },
   'la-send-ehc': {
@@ -2082,6 +2244,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['School reports and educational assessments', 'Medical evidence', 'Parental views (required to be included)', 'Child\'s views if appropriate'],
+      ruleIn: ['Child aged 0–25 with complex SEND needs', 'Needs not met by standard school support'],
+      ruleOut: [],
     },
   },
   'la-blue-badge': {
@@ -2107,6 +2271,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Enhanced Rate PIP mobility component confirmed'],
       means_tested: false,
       evidenceRequired: ['PIP or DLA award letter', 'Evidence of difficulty walking if applying on non-automatic criteria', 'Application to local council'],
+      ruleIn: ['Enhanced Rate PIP mobility or severe difficulty walking'],
+      ruleOut: [],
     },
   },
   'la-disabled-facilities-grant': {
@@ -2133,6 +2299,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: true,
       evidenceRequired: ['Occupational Therapist assessment', 'Quotes for proposed works', 'Income and savings details', 'Proof of disability'],
+      ruleIn: ['Disabled person living in property needing adaptations'],
+      ruleOut: [],
     },
   },
   'la-carers-assessment': {
@@ -2156,6 +2324,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['No formal documentation required — contact local authority adult social care to request'],
+      ruleIn: ['Adult unpaid carer providing regular substantial care'],
+      ruleOut: [],
     },
   },
   'la-business-rates': {
@@ -2180,6 +2350,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Business address', 'Date of occupation', 'Nature of business'],
+      ruleIn: ['Occupying non-domestic premises for business purposes'],
+      ruleOut: [],
     },
   },
   'la-food-hygiene': {
@@ -2203,6 +2375,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Business address and contact details', 'Nature of food business', 'Application via local authority website (free)'],
+      ruleIn: ['Operating a food business of any type'],
+      ruleOut: [],
     },
   },
 
@@ -2230,6 +2404,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Valid passport', 'Financial evidence (sufficient funds)', 'Purpose-specific documents: job offer/CoS, university CAS, relationship evidence, etc.', 'Immigration Health Surcharge payment'],
+      ruleIn: ['Non-UK/non-Irish national', 'Specific purpose for entering UK'],
+      ruleOut: ['British or Irish citizen'],
     },
   },
   'ho-eu-settled-status': {
@@ -2255,6 +2431,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Valid EU/EEA/Swiss passport or national identity card', 'Evidence of UK residence (payslips, tenancy agreement, bank statements, etc.)'],
+      ruleIn: ['EU, EEA, or Swiss national', 'Living in UK before 31 December 2020'],
+      ruleOut: ['Not EU/EEA/Swiss national and not family member of one'],
     },
   },
   'ho-brp': {
@@ -2279,6 +2457,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Visa granted for over 6 months — BRP collection instructions given with visa'],
       means_tested: false,
       evidenceRequired: ['Passport containing visa vignette sticker', 'BRP collection letter or email from Home Office'],
+      ruleIn: ['Granted UK visa or leave to remain for 6+ months'],
+      ruleOut: [],
     },
   },
   'ho-life-in-uk': {
@@ -2303,6 +2483,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Test pass certificate (issued at test centre)', 'Booking required online — £50 fee per attempt'],
+      ruleIn: ['Applying for ILR or British citizenship', 'Aged 18 to 64'],
+      ruleOut: ['Under 18 or aged 65 and over (exempt)'],
     },
   },
   'ho-ilr': {
@@ -2329,6 +2511,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Passport(s) covering entire qualifying period', 'Proof of continuous residence (payslips, bank statements, tenancy agreements)', 'Life in the UK test certificate', 'English language evidence', 'SET(O) or relevant form'],
+      ruleIn: ['5 years lawful residence on eligible visa', 'Not exceeded 180 days abroad in any 12-month period'],
+      ruleOut: [],
     },
   },
   'ho-citizenship': {
@@ -2355,6 +2539,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['ILR document or eVisa evidence', 'Passport(s)', 'Life in the UK test certificate', 'English language certificate (if applicable)', 'AN1 form', 'Application fee (£1,500)'],
+      ruleIn: ['Held ILR for at least 12 months', 'In UK 5 years with limited time abroad'],
+      ruleOut: ['More than 90 days abroad in last 12 months'],
     },
   },
 
@@ -2382,6 +2568,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Online account via the OPG portal', 'Registration fee (£82 per LPA, or fee remission if on low income)', 'Certificate provider details', 'Attorney and donor signatures'],
+      ruleIn: ['Donor aged 18+ with current mental capacity'],
+      ruleOut: ['Donor has already lost mental capacity'],
     },
   },
   'opg-lpa-activation': {
@@ -2406,6 +2594,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Death certificate', 'Original LPA document to return to OPG', 'LP4 notification form'],
+      ruleIn: ['Registered LPA in place', 'Donor has died'],
+      ruleOut: [],
     },
   },
 
@@ -2432,6 +2622,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Property purchase completed and SDLT filed — solicitor handles Land Registry application'],
       means_tested: false,
       evidenceRequired: ['TR1 transfer deed', 'SDLT5 certificate from HMRC', 'AP1 application form', 'Title deeds (for first registration of unregistered land)', 'Registration fee (based on property value)'],
+      ruleIn: ['Property purchase completed in England or Wales'],
+      ruleOut: [],
     },
   },
 
@@ -2457,6 +2649,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Marriage certificate or deed poll', 'Current passport', 'New passport photos', 'Application form and fee (£88.50 for adult online, higher by post)'],
+      ruleIn: ['Legal name change via marriage or deed poll'],
+      ruleOut: [],
     },
   },
   'other-tv-licence-pension': {
@@ -2481,6 +2675,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Aged 75+ AND receiving Pension Credit'],
       means_tested: false,
       evidenceRequired: ['Pension Credit award letter', 'Date of birth confirmation', 'Apply online at tvlicensing.co.uk'],
+      ruleIn: ['Aged 75 or over', 'Receiving Pension Credit'],
+      ruleOut: ['Under 75', 'Not receiving Pension Credit'],
     },
   },
   'other-motability': {
@@ -2506,6 +2702,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Enhanced Rate PIP mobility with 12+ months remaining on award'],
       means_tested: false,
       evidenceRequired: ['PIP award letter confirming Enhanced Rate mobility component', 'At least 12 months remaining on award'],
+      ruleIn: ['Enhanced Rate PIP mobility component', '12+ months remaining on PIP award'],
+      ruleOut: [],
     },
   },
   'other-disabled-railcard': {
@@ -2530,6 +2728,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Any PIP award (daily living or mobility, any rate)', 'Attendance Allowance (any rate)'],
       means_tested: false,
       evidenceRequired: ['Benefit award letter (PIP, DLA or AA)', 'Photo ID', 'Application at disabledpersons-railcard.co.uk'],
+      ruleIn: ['Receiving PIP, DLA, or Attendance Allowance'],
+      ruleOut: [],
     },
   },
   'other-employers-liability': {
@@ -2555,6 +2755,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Some exemptions exist for businesses employing only their owner (sole director), and certain family businesses.'],
       means_tested: false,
       evidenceRequired: ['Insurance certificate (must be kept and available for inspection)', 'Minimum £5m cover required'],
+      ruleIn: ['Employing one or more staff'],
+      ruleOut: ['Sole director business employing no other staff'],
     },
   },
   'other-dbs': {
@@ -2578,6 +2780,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Multiple identity documents (passport, driving licence, utility bills, etc.)', 'Employer applies on applicant\'s behalf'],
+      ruleIn: ['Role involves working with children or vulnerable adults'],
+      ruleOut: [],
     },
   },
   'other-right-to-work': {
@@ -2603,6 +2807,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['All new employees — employer obligation'],
       means_tested: false,
       evidenceRequired: ['British/Irish passport, or BRP/eVisa share code for non-UK/Irish nationals'],
+      ruleIn: [],
+      ruleOut: [],
     },
   },
   'other-pupil-premium': {
@@ -2628,6 +2834,8 @@ export const NODES: Record<string, ServiceNode> = {
       autoQualifiers: ['Free School Meals eligibility confirmed — school receives funding automatically'],
       means_tested: false,
       evidenceRequired: ['Free School Meals confirmation — school notifies DfE automatically'],
+      ruleIn: ['Child eligible for Free School Meals in last 6 years', 'Looked-after child or care leaver'],
+      ruleOut: [],
     },
   },
   'other-statutory-redundancy': {
@@ -2653,6 +2861,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Self-employed are not eligible.', 'Voluntary redundancy may have different terms (could be more generous, or affect entitlement to notice periods).', 'Not available if dismissed for gross misconduct.'],
       means_tested: false,
       evidenceRequired: ['Redundancy notice or letter from employer', 'Employment contract', 'Payslips to verify weekly pay'],
+      ruleIn: ['Compulsory redundancy after 2+ years continuous employment'],
+      ruleOut: ['Self-employed', 'Dismissed for gross misconduct'],
     },
   },
   'other-carers-leave': {
@@ -2677,6 +2887,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['Employer may request written evidence of the caring situation in some cases'],
+      ruleIn: ['Employee (not self-employed)', 'Dependant with long-term care need'],
+      ruleOut: [],
     },
   },
   'other-help-to-buy': {
@@ -2703,6 +2915,8 @@ export const NODES: Record<string, ServiceNode> = {
       exclusions: ['Not available to existing homeowners or those who have previously owned property.'],
       means_tested: true,
       evidenceRequired: ['Proof of first-time buyer status', 'Mortgage agreement in principle', 'Proof of income for scheme qualification'],
+      ruleIn: ['First-time buyer', 'Household income within scheme cap'],
+      ruleOut: ['Existing or previous homeowner'],
     },
   },
 
@@ -2728,6 +2942,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: false,
       evidenceRequired: ['PAYE employer reference number', 'Chosen pension provider details', 'Letter of compliance to The Pensions Regulator (declaration of compliance within 5 months of duties start date)'],
+      ruleIn: ['Employing workers aged 22 to State Pension age earning £10k+/year'],
+      ruleOut: [],
     },
   },
 
@@ -2756,6 +2972,8 @@ export const NODES: Record<string, ServiceNode> = {
       ],
       means_tested: true,
       evidenceRequired: ['Proof of identity (passport)', 'Proof of course enrollment or offer letter', 'Household income evidence (P60 or self-assessment from parents/partner)', 'National Insurance number'],
+      ruleIn: ['Starting UK undergraduate course', 'UK resident 3+ years'],
+      ruleOut: ['Already holds equivalent undergraduate degree'],
     },
   },
 };

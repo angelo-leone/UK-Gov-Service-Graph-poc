@@ -26,6 +26,8 @@ const nodeElements = Object.values(NODES).map(n => ({
     universal:          n.eligibility.universal,
     means_tested:       n.eligibility.means_tested,
     eligibilitySummary: n.eligibility.summary,
+    ruleIn:             n.eligibility.ruleIn,
+    ruleOut:            n.eligibility.ruleOut,
   },
 }));
 
@@ -126,6 +128,10 @@ const html = `<!DOCTYPE html>
     .det-id{font-size:.63rem;color:var(--muted);margin-top:6px}
     .stats-line{font-size:.7rem;color:var(--muted);line-height:1.9}
     .stats-line span{color:var(--text)}
+    .elig-tags{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}
+    .etag{font-size:.67rem;padding:2px 7px;border-radius:10px;line-height:1.5}
+    .etag-in{background:#0f2d1a;color:#3fb950;border:1px solid #238636}
+    .etag-out{background:#2d0f0f;color:#f85149;border:1px solid #6e2222}
   </style>
 </head>
 <body>
@@ -420,6 +426,14 @@ const html = `<!DOCTYPE html>
         + '<div>' + badges + '</div>'
         + '<p class="det-desc">' + d.desc + '</p>'
         + '<p class="det-elig">' + d.eligibilitySummary + '</p>'
+        + (d.ruleIn  && d.ruleIn.length
+            ? '<div class="elig-tags">'
+              + d.ruleIn.map(function(s){ return '<span class="etag etag-in">\u2713 '+s+'</span>'; }).join('')
+              + '</div>' : '')
+        + (d.ruleOut && d.ruleOut.length
+            ? '<div class="elig-tags">'
+              + d.ruleOut.map(function(s){ return '<span class="etag etag-out">\u2717 '+s+'</span>'; }).join('')
+              + '</div>' : '')
         + (lifeEvts ? '<p class="det-stitle">Entry point for</p><p style="font-size:.73rem">' + lifeEvts + '</p>' : '')
         + (inEdges.length  ? '<p class="det-stitle">Prerequisites (' + inEdges.length + ')</p><ul class="det-list">' + nodeList(inEdges) + '</ul>' : '')
         + (outEdges.length ? '<p class="det-stitle">Leads to (' + outEdges.length + ')</p><ul class="det-list">' + nodeList(outEdges) + '</ul>' : '')
