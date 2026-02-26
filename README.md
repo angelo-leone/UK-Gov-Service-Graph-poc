@@ -12,7 +12,7 @@ This is a proof-of-concept for a machine-readable service graph that maps the cr
 
 ## The graph explorer
 
-The interactive explorer visualises 96 service nodes across 12 departments, connected by two edge types:
+The interactive explorer visualises 108 service nodes across 14 departments, connected by two edge types:
 
 - **REQUIRES** (solid blue arrow) — strict ordering; must complete the source before the target
 - **ENABLES** (dashed grey arrow) — the source makes the target accessible or relevant
@@ -32,7 +32,7 @@ The `src/graph-server.ts` file is an MCP server exposing the graph to AI agents 
 
 | Tool | What it does |
 |---|---|
-| `list_life_events` | Returns the 13 supported life events as entry points |
+| `list_life_events` | Returns the 16 supported life events as entry points |
 | `plan_journey` | Computes a sequenced, phased service journey for one or more life events |
 | `get_service` | Returns full eligibility detail for a specific service node |
 
@@ -72,11 +72,75 @@ npm run mcp
 ```
 index.html          Static graph explorer (self-contained, GitHub Pages)
 src/
-  graph-data.ts     96 service nodes, typed edges, 13 life events
+  graph-data.ts     108 service nodes, typed edges, 16 life events
   graph-engine.ts   BFS + topological sort → phased journey planner
   graph-server.ts   MCP server (list_life_events, plan_journey, get_service)
 scripts/
   build-index.ts    Generates index.html from graph data
+```
+
+---
+
+## Service node schema
+
+Every node in the graph is a `ServiceNode` object. Here is what each field means:
+
+| Field | Type | What it means |
+|---|---|---|
+| `id` | `string` | Unique slug in `dept-name` format, e.g. `dwp-pip` |
+| `name` | `string` | Human-readable service name, e.g. `"Personal Independence Payment"` |
+| `dept` | `string` | Owning department display name, e.g. `"DWP"` |
+| `deptKey` | `string` | Lowercase slug used for filtering and colouring, e.g. `"dwp"` |
+| `serviceType` | enum | Category of service — one of `benefit`, `entitlement`, `obligation`, `registration`, `application`, `legal_process`, `document`, `grant` |
+| `deadline` | `string \| null` | Time-sensitive deadline if one exists, e.g. `"42 days"` for birth registration; `null` if open-ended |
+| `desc` | `string` | One or two sentence plain-English description of what the service does and why it matters |
+| `govuk_url` | `string` | Canonical GOV.UK URL |
+| `proactive` | `boolean` | `true` if an AI agent should volunteer this service unprompted when a relevant life event is detected |
+| `gated` | `boolean` | `true` if the service should only be surfaced after confirming a prerequisite is in place (e.g. don't mention probate until the death is registered) |
+
+The `eligibility` object on each node carries the structured data an agent needs to assess and explain entitlement:
+
+| Field | Type | What it means |
+|---|---|---|
+| `summary` | `string` | One or two sentence plain-English eligibility overview |
+| `universal` | `boolean` | `true` if virtually anyone in the relevant situation qualifies — no further gating needed |
+| `means_tested` | `boolean` | `true` if the payment or amount depends on income or savings |
+| `criteria` | `array` | Each entry is a `{ factor, description }` pair — `factor` is a category (e.g. `age`, `income`, `disability`) and `description` explains the specific rule in plain English |
+| `keyQuestions` | `array` | Questions an AI agent should ask the user to determine whether they qualify |
+| `autoQualifiers` | `array` (optional) | Conditions that make eligibility certain — if any are met, the agent can skip further checks |
+| `exclusions` | `array` (optional) | Common reasons someone is *not* eligible, worth surfacing proactively |
+| `evidenceRequired` | `array` (optional) | Documents or proof the user will typically need to apply |
+| `ruleIn` | `array` | Concise 3–7 word positive signals that qualify someone, e.g. `"Disability or long-term health condition"`. Empty `[]` for truly universal services |
+| `ruleOut` | `array` | Concise 3–7 word hard disqualifiers, e.g. `"Reached State Pension age (66+)"`. Empty `[]` if none apply |
+
+**Example — `dwp-pip` (Personal Independence Payment):**
+
+```jsonc
+{
+  "id": "dwp-pip",
+  "name": "Personal Independence Payment",
+  "dept": "DWP",
+  "deptKey": "dwp",
+  "serviceType": "benefit",
+  "deadline": null,
+  "proactive": true,
+  "gated": true,
+  "eligibility": {
+    "summary": "For people aged 16–64 with a long-term physical or mental health condition ...",
+    "universal": false,
+    "means_tested": false,
+    "criteria": [
+      { "factor": "disability", "description": "Long-term physical or mental health condition ..." },
+      { "factor": "age",        "description": "Must be aged 16–64 ..." }
+    ],
+    "keyQuestions": [
+      "Do you have a long-term health condition or disability?",
+      "Are you aged 16–64?"
+    ],
+    "ruleIn":  ["Disability or long-term health condition", "Aged 16–64"],
+    "ruleOut": ["Reached State Pension age (66+)"]
+  }
+}
 ```
 
 ---
